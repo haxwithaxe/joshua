@@ -1,4 +1,5 @@
 # joshua> would you like to play a game?
+see ./LICENSE
 
 * based on a script written by a friend
 * i added an interactive chat like capability and a builtin listener
