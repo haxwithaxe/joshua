@@ -161,6 +161,9 @@ class Listener(pykka.ThreadingActor):
 	def __init__(self, **kwargs):
 		super(Listener, self).__init__()
 		self.localhost = Localhost()
+		self.master = None
+		if 'ui_ref' in kwargs:
+			self.master = master
 		print('Listener', kwargs)
 
 	def on_receive(self, message):
@@ -201,7 +204,7 @@ class NonInteractiveCLI(pykka.ThreadingActor):
 		if self.mode in (SEND_ONLY_MODE, SEND_THEN_LISTEN_MODE):
 			self.sender = Sender(master=self.actor_ref, dest=dest, src=src, msg=msg).start()
 		elif self.mode in (LISTEN_ONLY_MODE, SEND_THEN_LISTEN_MODE):
-			self.listener = Listener(self.actor_ref).start()
+			self.listener = Listener(master=self.actor_ref).start()
 		else:
 			print('no such mode for noninteractive mode.')
 
@@ -231,8 +234,8 @@ class InteractiveCLI(pykka.ThreadingActor):
 	def __init__(self, mode=None, dest={'host':None, 'port':None}, src={'host':None, 'port':None}, msg=None):
 		print(mode, dest, src, msg)
 		super(InteractiveCLI, self).__init__()
-		self.sender = Sender(self.actor_ref).start()
-		self.listener = Listener(self.actor_ref).start()
+		self.sender = Sender(master=self.actor_ref).start()
+		self.listener = Listener(master=self.actor_ref).start()
 		self.mode = mode
 		self.dest = dest
 		self.src = src
